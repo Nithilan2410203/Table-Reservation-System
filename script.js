@@ -4,17 +4,16 @@ const users = {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Listen for Enter key press on both login forms
     document.getElementById("user-login").addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
-            event.preventDefault(); // Prevent form submission if needed
+            event.preventDefault(); 
             validateLogin("user");
         }
     });
 
     document.getElementById("admin-login").addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
-            event.preventDefault(); // Prevent form submission if needed
+            event.preventDefault(); 
             validateLogin("admin");
         }
     });
@@ -78,33 +77,28 @@ document.getElementById("reservationForm").addEventListener("submit", function (
     let time = document.getElementById("time").value;
     
     let now = new Date();
-    let today = now.toISOString().split("T")[0]; // Current date (YYYY-MM-DD)
+    let today = now.toISOString().split("T")[0];
     let selectedDate = new Date(date);
     let errorMessage = "";
 
-    // Full Name Validation (Only alphabets and spaces, min length 3)
     let namePattern = /^[A-Za-z\s]{3,}$/;
     if (!namePattern.test(name)) {
         errorMessage = "Please enter a valid name (only letters, min 3 characters).";
     }
 
-    // Email Validation
     let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
         errorMessage = "Please enter a valid email address.";
     }
 
-    // Date Validation (Must be today or a future date)
     if (selectedDate < now.setHours(0, 0, 0, 0)) {
         errorMessage = "Please select today or a future date.";
     }
 
-    // Time Validation (Between 10:00 AM and 10:00 PM)
     let selectedTime = new Date(`1970-01-01T${time}:00`);
     let openingTime = new Date(`1970-01-01T10:00:00`);
     let closingTime = new Date(`1970-01-01T22:00:00`);
     
-    // If booking for today, ensure time is in the future
     if (date === today) {
         let currentTime = new Date(`1970-01-01T${now.getHours()}:${now.getMinutes()}:00`);
         if (selectedTime < currentTime) {
@@ -116,7 +110,6 @@ document.getElementById("reservationForm").addEventListener("submit", function (
         errorMessage = "Please select a time between 10:00 AM and 10:00 PM.";
     }
 
-    // Guests Validation (Min 1, Max 20)
     if (guests < 1 || guests > 20) {
         errorMessage = "Number of guests must be between 1 and 20.";
     }
