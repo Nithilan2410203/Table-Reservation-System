@@ -1,0 +1,12 @@
+[2025-04-28 01:41:08] REQUEST: No query string
+[2025-04-28 01:41:08] ERROR: Missing method or query string
+[2025-04-28 01:41:08] WARNING: Delete response sent: success=false
+[2025-04-28 01:42:13] REQUEST: id=undefined
+[2025-04-28 01:42:13] ERROR: Invalid ID format: id=undefined
+[2025-04-28 01:42:13] WARNING: Delete response sent: success=false
+[2025-04-28 01:43:23] REQUEST: id=undefined
+[2025-04-28 01:43:23] ERROR: Invalid ID format: id=undefined
+[2025-04-28 01:43:23] WARNING: Delete response sent: success=false
+[2025-04-28 01:43:30] REQUEST: id=undefined
+[2025-04-28 01:43:30] ERROR: Invalid ID format: id=undefined
+[2025-04-28 01:43:30] WARNING: Delete response sent: success=false

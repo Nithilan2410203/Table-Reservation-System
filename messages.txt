@@ -1,0 +1,16 @@
+Name: Nithilan
+Email: nithilan1234@gmail.com
+Message: New Message
+---
+Name: New
+Email: new123@gmail.com
+Message: Helloooo
+---
+Name: Abhijith Sriram
+Email: sriram@gmail.com
+Message: the idli was nice
+---
+Name: nithilan
+Email: nithilan1234@gmail.com
+Message: Hiiii, i loved your briyani
+---

@@ -1,0 +1,3 @@
+[
+{ "reservation_ID": 1, "name": "Muskan", "email": "muskan12345@gmail.com", "guests": 7, "date": "2025-05-01", "time": "16:00", "status": "CONFIRMED" }
+]
