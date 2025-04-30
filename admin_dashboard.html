@@ -5,26 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - MR Pandian Hotel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for trash icon -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
         }
         .dashboard-container {
             margin-top: 30px;
         }
-        .table-container {
-            margin-top: 20px;
+        h4 {
+            color: #343a40;
+            margin-bottom: 10px;
         }
-        .navbar {
+        .reservation-card {
+            position: relative;
+        }
+        .delete-btn {
             position: absolute;
-            width: 100%;
-            top: 0;
-            z-index: 10;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 5px 10px;
+            cursor: pointer;
         }
-
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .delete-btn i {
+            font-size: 16px; /* Adjust icon size */
+        }
+        .edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 40px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .edit-btn:hover {
+            background-color: #0056b3;
+        }
+        .edit-btn i {
+            font-size: 16px;
         }
     </style>
 </head>
@@ -38,13 +69,14 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="menu.html">Menu</a></li>
-                <li class="nav-item"><a class="nav-link" href="reservation.html">Reservations</a></li>
-                <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
-                <li class="nav-item"><a class="nav-link" href="index.html">Logout</a></li>
-            </ul>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="admin_home.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin_menu.html">Menu</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin_messages.html">Messages</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin_reservations.html">New Reservation</a></li>
+            <li class="nav-item"><a class="nav-link active" href="admin_dashboard.html">Reservations</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html" style="color: red;">Logout</a></li>
+          </ul>
         </div>
     </div>
 </nav>
@@ -54,66 +86,310 @@
     <h2 class="text-center">Admin Dashboard</h2>
 
     <!-- Search Bar -->
-    <div class="mb-3">
-        <input type="text" class="form-control" id="searchInput" placeholder="Search Reservation by Name" onkeyup="searchReservation()">
+    <div class="mb-3 d-flex gap-3">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search by Name, Email, Date, or Time" onkeyup="searchReservation()">
     </div>
 
-    <!-- Reservation Table -->
-    <div class="table-container">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Guests</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="reservationTable">
-                <tr>
-                    <td>John Doe</td>
-                    <td>johndoe@gmail.com</td>
-                    <td>2024-06-10</td>
-                    <td>19:00</td>
-                    <td>4</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="deleteReservation(this)">Delete</button></td>
-                </tr>
-                <tr>
-                    <td>Mary Jane</td>
-                    <td>maryjane@gmail.com</td>
-                    <td>2024-06-11</td>
-                    <td>20:30</td>
-                    <td>2</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="deleteReservation(this)">Delete</button></td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- Reservations Cards -->
+    <div class="container" id="cardsContainer">
+        <!-- Reservations will be inserted here as cards -->
+    </div>
+
+</div>
+
+<!-- Edit Reservation Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="edit_name" name="name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit_email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_guests" class="form-label">Guests</label>
+                        <input type="number" class="form-control" id="edit_guests" name="guests">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="edit_date" name="date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_time" class="form-label">Time</label>
+                        <input type="time" class="form-control" id="edit_time" name="time">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_status" class="form-label">Status</label>
+                        <select class="form-select" id="edit_status" name="status">
+                            <option value="CONFIRMED">Confirmed</option>
+                            <option value="WAITLISTED">Waitlisted</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="edit_reservation_id">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- JavaScript for Admin Functions -->
 <script>
-    function searchReservation() {
-        let input = document.getElementById("searchInput").value.toLowerCase();
-        let rows = document.querySelectorAll("#reservationTable tr");
+  let reservations = [];
 
-        rows.forEach(row => {
-            let name = row.cells[0].innerText.toLowerCase();
-            if (name.includes(input)) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
+  // Function to load reservations from the server
+  async function loadReservations() {
+      try {
+          const response = await fetch('/cgi-bin/admin_dashboard_handler.cgi');
+          reservations = await response.json();
+          renderReservations();
+      } catch (error) {
+          console.error("Failed to load reservations", error);
+      }
+  }
+
+  // Function to render reservations
+  function renderReservations() {
+    const container = document.getElementById("cardsContainer");
+
+    // Clear previous cards
+    container.innerHTML = '';
+
+    if (reservations.length === 0) {
+        container.innerHTML = `<div class="text-center text-muted">No reservations found.</div>`;
+        return;
+    }
+
+    // Group reservations by date
+    const grouped = {};
+    reservations.forEach(res => {
+        if (!grouped[res.date]) {
+            grouped[res.date] = [];
+        }
+        grouped[res.date].push(res);
+    });
+
+    // Sort dates
+    const sortedDates = Object.keys(grouped).sort();
+
+    // Render reservation cards
+    sortedDates.forEach(date => {
+        const dateHeading = `<h4 class="mt-4 text-primary border-bottom pb-2">${date}</h4>`;
+        container.innerHTML += dateHeading;
+        
+        const row = document.createElement("div");
+        row.className = "row g-3 mb-4";
+
+        grouped[date].forEach(res => {
+            const card = document.createElement("div");
+            card.className = "col-md-4";
+            card.innerHTML = `
+                <div class="card shadow-sm h-100 reservation-card">
+                    <button class="delete-btn" onclick="deleteReservation(${res.reservation_ID})">
+                        <i class="fas fa-trash"></i> <!-- Trash icon -->
+                    </button>
+                    <button class="edit-btn" onclick="editReservation(${res.reservation_ID})">
+                        <i class="fas fa-edit"></i> <!-- Edit icon -->
+                    </button>
+                    <div class="card-body">
+                        <h5 class="card-title">${res.name}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${res.email}</h6>
+                        <p class="card-text">
+                            Guests: <strong>${res.guests}</strong><br>
+                            Time: <strong>${res.time}</strong><br>
+                            Status: ${res.status === "CONFIRMED" 
+                                ? '<span class="badge bg-success">Confirmed</span>' 
+                                : '<span class="badge bg-warning text-dark">Waitlisted</span>'}
+                        </p>
+                    </div>
+                </div>
+            `;
+            row.appendChild(card);
         });
+
+        container.appendChild(row);  // Append the row with cards to the container
+    });
+  }
+
+  // Function to delete a reservation
+  async function deleteReservation(reservation_ID) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you really want to delete this reservation?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',  // Red
+        cancelButtonColor: '#3085d6', // Blue
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch(`/cgi-bin/delete_reservation.cgi?id=${reservation_ID}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast('success', 'Reservation deleted successfully!');
+                loadReservations(); // Reload to reflect deletion
+            } else {
+                showToast('error', 'Failed to delete reservation.');
+            }
+        } catch (error) {
+            console.error("Error deleting reservation:", error);
+            showToast('error', 'An error occurred while deleting.');
+        }
+    }
+  }
+
+  // Function to edit a reservation
+  async function editReservation(reservation_ID) {
+    const reservation = reservations.find(res => res.reservation_ID === reservation_ID);
+    if (reservation) {
+        document.getElementById("edit_name").value = reservation.name;
+        document.getElementById("edit_email").value = reservation.email;
+        document.getElementById("edit_guests").value = reservation.guests;
+        document.getElementById("edit_date").value = reservation.date;
+        document.getElementById("edit_time").value = reservation.time;
+        document.getElementById("edit_status").value = reservation.status;
+        document.getElementById("edit_reservation_id").value = reservation_ID;
+        const modal = new bootstrap.Modal(document.getElementById('editModal'));
+        modal.show();
+    }
+  }
+
+  // Function to save edited reservation
+  document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const reservation_ID = document.getElementById("edit_reservation_id").value;
+    const updatedData = {
+        name: document.getElementById("edit_name").value,
+        email: document.getElementById("edit_email").value,
+        guests: document.getElementById("edit_guests").value,
+        date: document.getElementById("edit_date").value,
+        time: document.getElementById("edit_time").value,
+        status: document.getElementById("edit_status").value
+    };
+
+    try {
+        const response = await fetch(`/cgi-bin/edit_reservation.cgi?id=${reservation_ID}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('success', 'Reservation updated successfully!');
+            loadReservations(); // Reload to reflect changes
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            modal.hide(); // Close the modal
+        } else {
+            showToast('error', 'Failed to update reservation.');
+        }
+    } catch (error) {
+        console.error("Error updating reservation:", error);
+        showToast('error', 'An error occurred while updating.');
+    }
+  });
+
+  // Helper to show toast
+  function showToast(icon, message) {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: icon,
+        title: message,
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        background: '#f0f0f0',
+        color: '#000',
+    });
+  }
+
+  // Function to handle search
+  function searchReservation() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = reservations.filter(res =>
+        res.name.toLowerCase().includes(query) ||
+        res.email.toLowerCase().includes(query) ||
+        res.date.includes(query) ||
+        res.time.includes(query)
+    );
+
+    const container = document.getElementById("cardsContainer");
+    container.innerHTML = '';
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center text-muted">No matching reservations found.</div>`;
+        return;
     }
 
-    function deleteReservation(button) {
-        let row = button.closest("tr");
-        row.remove();
-        alert("Reservation deleted successfully!");
-    }
+    // Group and render filtered reservations
+    const grouped = {};
+    filtered.forEach(res => {
+        if (!grouped[res.date]) {
+            grouped[res.date] = [];
+        }
+        grouped[res.date].push(res);
+    });
+
+    const sortedDates = Object.keys(grouped).sort();
+
+    sortedDates.forEach(date => {
+        const dateHeading = `<h4 class="mt-4 text-primary border-bottom pb-2">${date}</h4>`;
+        container.innerHTML += dateHeading;
+
+        const row = document.createElement("div");
+        row.className = "row g-3 mb-4";
+
+        grouped[date].forEach(res => {
+            const card = document.createElement("div");
+            card.className = "col-md-4";
+            card.innerHTML = `
+                <div class="card shadow-sm h-100 reservation-card">
+                    <button class="delete-btn" onclick="deleteReservation(${res.reservation_ID})">
+                        <i class="fas fa-trash"></i> <!-- Trash icon -->
+                    </button>
+                    <button class="edit-btn" onclick="editReservation(${res.reservation_ID})">
+                        <i class="fas fa-edit"></i> <!-- Edit icon -->
+                    </button>
+                    <div class="card-body">
+                        <h5 class="card-title">${res.name}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${res.email}</h6>
+                        <p class="card-text">
+                            Guests: <strong>${res.guests}</strong><br>
+                            Time: <strong>${res.time}</strong><br>
+                            Status: ${res.status === "CONFIRMED" 
+                                ? '<span class="badge bg-success">Confirmed</span>' 
+                                : '<span class="badge bg-warning text-dark">Waitlisted</span>'}
+                        </p>
+                    </div>
+                </div>
+            `;
+            row.appendChild(card);
+        });
+
+        container.appendChild(row);
+    });
+  }
+
+  // Initialize the page by loading reservations
+  document.addEventListener("DOMContentLoaded", function () {
+      loadReservations();
+  });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

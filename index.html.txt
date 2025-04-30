@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>C Backend Test</title>
+</head>
+<body>
+  <h2>Frontend to C Backend</h2>
+  <button onclick="contactBackend()">Call Backend</button>
+  <div id="output"></div>
+
+  <script>
+    function contactBackend() {
+      fetch("/cgi-bin/backend.exe")
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("output").innerHTML = data;
+        })
+        .catch(err => {
+          document.getElementById("output").innerHTML = "Error: " + err;
+        });
+    }
+  </script>
+</body>
+</html>
